@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hirsipuu</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-image: url('https://i.gyazo.com/cf62c3e403730011d0a7e81c435175ab.png'); /* Korvaa 'taustakuva.jpg' tiedoston polulla oikeaan taustakuvaan */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+        #start-screen h1 {
+            color: #333; /* Tekstin väri */
+            font-family: "Courier New", Courier, monospace; /* Fontti */
+        }
+        #container {
+            background-color: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+        #output {
+            margin-top: 20px;
+        }
+        .button {
+            margin: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #instructions {
+            display: none;
+            text-align: left;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background-color: rgba(255, 255, 255, 0.9); /* Muutetaan taustaväri läpinäkyväksi valkoiseksi */
+            border-radius: 10px; /* Lisätään hieman pyöristystä reunoille */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Lisätään kevyt varjo erottamaan tausta */
+        }
+        #news {
+            display: none;
+            background-color: black;
+            color: red;
+            font-size: 24px;
+            padding: 50px;
+        }
+        .news-list {
+            text-align: left;
+            margin-top: 20px;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div id="start-screen">
+        <h1>Tervetuloa Skotti Edition Hirsipuu-peliin!</h1>
+        <button class="button" onclick="startGame()">PELAA</button>
+        <button class="button" onclick="showInstructions()">OHJE</button>
+        <button class="button" onclick="showNews()">UUTISET</button>
+    </div>
+
+    <div id="container" style="display: none;">
+        <h1>Hirsipuu</h1>
+        <p>Arvaa sana kirjaimen kerrallaan. Sanat ovat tuttuja, Skotin mielivaltaisesta sanavarastosta.</p>
+        <p>Sana: <span id="word"></span></p>
+        <p>Arvauksesi: <input type="text" id="guess" maxlength="1" autocomplete="off"></p>
+        <button onclick="guessLetter()">Arvaa</button>
+        <div id="output"></div>
+        <button class="button" onclick="showStartScreen()">Takaisin aloitussivulle</button>
+    </div>
+
+    <div id="instructions">
+        <h1>SKOTTI's EDITION HIRSIPUU-PELI</h1>
+        <p style="font-weight: bold; color: #333;">Tervetuloa SKOTTI hirsipuu pelin pariin! Tässä lyhyet ohjeet, miten pelata peliä.</p>
+        <ol>
+            <li>Avaa peli painamalla "PELAA"-painiketta.</li>
+            <li>Kirjoita haluamasi kirjain kenttään, jos kirjain on sanassa, se ilmestyy viivalle, jos se ei ole yrityksesi määrä pienenee.</li>
+            <li>Kun tiedät mielestäsi oikean sanan, ET voi kirjoittaa sitä kenttään, vaan sinun tulee kirjoittaa se kirjan kirjaimelta kyseiseen kenttään.</li>
+            <li>Kun sana on arvattu oikein, voit aloittaa pelin uudelleen ja saat uuden sanan selvitettäväksi!</li>
+        </ol>
+        <p>Game Made By: RAMMELLTD</p>
+        <p>Picture: Discord Gyazo BY UUNO</p>
+        <button class="button" onclick="showStartScreen()">Takaisin aloitussivulle</button>
+    </div>
+
+    <div id="news">
+        <p>LAST UPDATE 28.3.2024 KLO 10.00</p>
+        <hr style="border-top: 1px solid white;">
+        <ul class="news-list">
+            <li>Bugien korjauksia</li>
+            <li>Uusia sanoja lisätty</li>
+        </ul>
+        <button class="button" onclick="showStartScreen()">Takaisin aloitussivulle</button>
+    </div>
+
+    <script>
+        var words = ["clinkura", "uuno", "nuin", "mato", "atomi", "panu"]; // Lisätyt sanat
+        var word = words[Math.floor(Math.random() * words.length)]; // Satunnainen sana
+        var guessedLetters = [];
+        var remainingAttempts = 6;
+
+        // Näytä arvatut kirjaimet
+        function showGuessedLetters() {
+            var wordToShow = "";
+            for (var i = 0; i < word.length; i++) {
+                if (guessedLetters.includes(word[i])) {
+                    wordToShow += word[i];
+                } else {
+                    wordToShow += "_";
+                }
+            }
+            document.getElementById("word").textContent = wordToShow;
+        }
+
+        // Arvaa kirjain
+        function guessLetter() {
+            var guess = document.getElementById("guess").value.toLowerCase();
+            if (guess.length !== 1 || !/[a-z]/.test(guess)) {
+                alert("Syötä yksi kirjain a-z väliltä.");
+                return;
+            }
+            if (guessedLetters.includes(guess)) {
+                alert("Olet jo arvannut tämän kirjaimen.");
+                return;
+            }
+            guessedLetters.push(guess);
+            if (!word.includes(guess)) {
+                remainingAttempts--;
+            }
+            showGuessedLetters();
+            if (word.split("").every(letter => guessedLetters.includes(letter))) {
+                document.getElementById("output").textContent = "Onneksi olkoon, taisi nistille osua pikkunen onni!";
+            } else if (remainingAttempts <= 0) {
+                document.getElementById("output").textContent = "Valitettavasti hävisit pelin, vitu paska. Oikea sana oli: " + word;
+            } else {
+                document.getElementById("output").textContent = "Arvauksia jäljellä: " + remainingAttempts;
+            }
+            document.getElementById("guess").value = "";
+        }
+
+        // Alusta peli
+        function startGame() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("container").style.display = "block";
+            showGuessedLetters();
+        }
+
+        // Näytä ohjeet
+        function showInstructions() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("instructions").style.display = "block";
+        }
+
+        // Näytä uutiset
+        function showNews() {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("news").style.display = "block";
+        }
+
+        // Takaisin aloitussivulle
+        function showStartScreen() {
+            document.getElementById("container").style.display = "none";
+            document.getElementById("instructions").style.display = "none";
+            document.getElementById("news").style.display = "none";
+            document.getElementById("start-screen").style.display = "block";
+        }
+    </script>
+</body>
+</html>
